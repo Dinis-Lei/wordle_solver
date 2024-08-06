@@ -16,7 +16,6 @@
 #define N_THREADS 4
 #define PORT 5000
 
-
 struct Word {
     char word[PATTERN_LENGTH+1];
     bool valid;
@@ -157,6 +156,7 @@ double (*heuristic)(struct Word word, int w_index);
 
 struct Weights *weights;
 bool has_weights = false;
+char* PATH = "./";
 
 
 int main(int argc, char *argv[]) {
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 
     heuristic = &heuristic1;
 
-    while ((opt = getopt(argc, argv, "hib:w:23")) != -1) {
+    while ((opt = getopt(argc, argv, "hib:w:p:23")) != -1) {
         switch (opt) {
             case 'h':
                 printUsage(basename(argv[0]));
@@ -185,6 +185,9 @@ int main(int argc, char *argv[]) {
                     return EXIT_FAILURE;
                 }
                 has_weights = true;
+                break;
+            case 'p':
+                PATH = optarg;
                 break;
             case '2':
                 heuristic = &heuristic2;
@@ -770,7 +773,10 @@ double heuristic2(struct Word word, int w_index) {
 
 int read_word_file(char *filename) {
     printf("Opening file %s\n", filename);
-    FILE *file = fopen(filename, "r");
+    char path[256];
+    strcpy(path, PATH);
+    strcat(path, filename);
+    FILE *file = fopen(path, "r");
     if (file == NULL) {
         printf("Error opening file %s\n", filename);
         return 1;
@@ -813,7 +819,10 @@ int read_word_file(char *filename) {
 }
 
 int read_word_matrix(char *filename) {
-    FILE *file = fopen(filename, "r");
+    char path[256];
+    strcpy(path, PATH);
+    strcat(path, filename);
+    FILE *file = fopen(path, "r");
     if (file == NULL) {
         return EXIT_FAILURE;
     }
@@ -845,7 +854,13 @@ int read_word_matrix(char *filename) {
 }
 
 int read_weights(char *filename) {
-    FILE *file = fopen(filename, "r");
+    char path[256];
+    strcpy(path, PATH);
+    strcat(path, filename);
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        return EXIT_FAILURE;
+    }
 
     int file_size = 0;
     int c = fscanf(file, "%d", &file_size);
@@ -867,8 +882,10 @@ int read_weights(char *filename) {
 }
 
 int read_word_frequency(char *filename) {
-    FILE *file = fopen(filename, "r");
-
+    char path[256];
+    strcpy(path, PATH);
+    strcat(path, filename);
+    FILE *file = fopen(path, "r");
     if (file == NULL) {
         return EXIT_FAILURE;
     }
@@ -902,8 +919,10 @@ int read_word_frequency(char *filename) {
 }
 
 int read_word_probability(char *filename) {
-    FILE *file = fopen(filename, "r");
-
+    char path[256];
+    strcpy(path, PATH);
+    strcat(path, filename);
+    FILE *file = fopen(path, "r");
     if (file == NULL) {
         return EXIT_FAILURE;
     }
@@ -985,6 +1004,8 @@ static void printUsage (char *cmdName) {
            "  -h            --- Print this help screen\n"
            "  -i            --- Iteractive mode\n"
            "  -b [FNAME]    --- Batch mode\n"
+           "  -w [FNAME]    --- Weights file\n"
+           "  -p [PATH]     --- Path to the files\n"
            "  -1            --- Heuristic 1\n"
            "  -2            --- Heuristic 2 (best)\n", cmdName);
 }
