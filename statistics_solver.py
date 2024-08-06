@@ -10,7 +10,7 @@ class StatsSolver(SolverBase):
 
     def solve(self, msg):
         msg = super().solve(msg)
-        if msg:
+        if len(msg) == 5:
             guess_positions = {letter: [i for i, x in enumerate(self.guess) if x == letter] for letter in set(self.guess)}
             for letter, pos in guess_positions.items():
                 for p in pos:

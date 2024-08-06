@@ -16,9 +16,10 @@ class Peer2Peer(threading.Thread):
         self.ready = False
 
 
-    def send(self, address, msg):
+    def send(self, address, msg: str):
         """ Send msg to address. """
-        payload = pickle.dumps(msg)
+        #payload = pickle.dumps(msg)
+        payload = msg.encode()
         self.socket.sendto(payload, address)
 
     def recv(self):
@@ -33,17 +34,22 @@ class Peer2Peer(threading.Thread):
         return payload, addr
 
     def run(self):
-        self.socket.bind(self.address)
         print(f"Listening on {self.address}")
+        self.socket.bind(self.address)
+        
         if self.address[1] != 5000:
-            self.send(("localhost", 5000), "HELLO")
+            self.send(("localhost", 5000), "ACK")
+            print("Sent ACK to 5000")
 
         while self.running:
             data, address = self.recv()
             if data is not None:
-                output = pickle.loads(data)
+                #output = pickle.loads(data)
+                output = data.decode()
                 if output == "ACK":
                     self.logger.info(f"Received: {output}")
+                    print("Ready to receive messages.")
+                    self.send(address, "INIT")
                     continue
 
                 if output == "q":

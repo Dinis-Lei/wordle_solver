@@ -3,14 +3,15 @@ from peer2peer import Peer2Peer
 
 class SolverBase:
 
-    def __init__(self, address, callback) -> None:
+    def __init__(self, address, callback, fname='stats.txt') -> None:
         
         self.p2p = Peer2Peer(address, callback)
 
         self.df = pd.read_csv('word_stats.csv')
         self.guess = ""
         self.tries = 0
-        with open("stats.txt", 'w') as file:
+        self.fname = fname
+        with open(fname, 'w') as file:
             file.write("")
 
     def reset(self):
@@ -19,13 +20,13 @@ class SolverBase:
 
     def start(self):
         self.p2p.start()
-        # self.p2p.send(("localhost", 5000), "ACK")
+        #self.p2p.send(("localhost", 5000), "ACK")
         self.p2p.join()
 
 
     def solve(self, msg):
         if msg == "ooooo":
-            with open("stats.txt", 'a') as file:
+            with open(self.fname, 'a') as file:
                 file.write(f"{self.tries}\n")
             self.reset()
             msg = ""
